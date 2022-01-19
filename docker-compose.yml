@@ -1,0 +1,20 @@
+version: '3.3'
+
+services:
+  bookstore_api:
+    image: 0984760xxx/bookstore.api:alpha-2022.01.19
+    restart: always
+    environment:
+      - "DB_HOST=<dbhost>"
+      - "DB_USERNAME=<dbusername>"
+      - "DB_PASSWORD=<dbpassword>"
+    volumes:
+      - ./:/usr/src/app
+    build: .        # use this option to build image/ remove when run image in prodution server
+    ports:
+      - 5002:5002
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "5"
+        max-size: "100m"

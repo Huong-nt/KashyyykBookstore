@@ -1,0 +1,24 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[dev-packages]
+
+[packages]
+grpcio = "==1.26.0"
+flask-restful = "*"
+flask-cors = "*"
+flask-httpauth = "*"
+flask-limiter = "*"
+requests = "*"
+bson = "*"
+boto3 = "*"
+flask-sqlalchemy = "*"
+Flask-JWT-Extended = "*"
+mysql-connector-python = "*"
+mysqlclient = "*"
+jsonschema = "*"
+
+[requires]
+python_version = "3.7"
