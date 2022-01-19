@@ -45,8 +45,6 @@ class User(db.Model):
     email = db.Column(db.String(128), unique=True, index=True, nullable=False)
     name = db.Column(db.String(128))
     pseudonym = db.Column(db.String(128))
-    gender = db.Column(db.Enum('male', 'female'), default='male')
-    avatar = db.Column(db.String(100))
     confirmed = db.Column(db.Boolean, default=False)
     created = db.Column(db.DateTime(), default=datetime.utcnow)
     updated = db.Column(db.DateTime(), onupdate=datetime.utcnow)
@@ -65,9 +63,10 @@ class User(db.Model):
     def to_json(self):
         _json = {
             'id': self.id,
+            'username': self.username,
             'email': self.email,
             'name': self.name,
-            'gender': self.gender,
+            'pseudonym': self.pseudonym,
             'confirmed': self.confirmed,
             'created': self.created,
             'updated': self.updated,
