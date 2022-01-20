@@ -19,7 +19,6 @@ from flask_limiter.util import get_ipaddr
 from config import config
 from boto3.session import Session
 from .utils.flask_boto3 import Boto3
-from .utils.otp import Otp
 
 
 class JSONEncoder(json.JSONEncoder):
@@ -41,7 +40,6 @@ class JSONEncoder(json.JSONEncoder):
 db = SQLAlchemy()
 jwt = JWTManager()
 boto = Boto3()
-otp = Otp()
 limiter = Limiter(
     key_func=get_ipaddr,
     default_limits=["5000 per day", "1000 per hour"]
@@ -62,7 +60,6 @@ def create_app(config_name):
     db.init_app(app)
     jwt.init_app(app)
     boto.init_app(app)
-    otp.init_app(app)
     limiter.init_app(app)
     CORS(app, resources=r'/bookstore/api/*', allow_headers=['Content-Type', 'Authorization'])
 
