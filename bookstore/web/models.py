@@ -111,34 +111,12 @@ class Book(db.Model):
     def to_json(self):
         _json = {
             'id': self.id,
-            'type': self.type.to_json(),
-            'sim': self.sim,
-            'imei': self.imei,
-            'hardware_version': self.hardware_version,
-            'firmware_version': self.firmware_version,
-            'mfg': self.mfg,
-            'alert': self.alert,
-            'blocking': self.blocking,
-            'testing': self.testing,
-            'state': self.state,
-            'config': self.config.to_json() if self.config is not None else {},
-            'subscription': self.subscription.to_json() if self.subscription is not None else None,
-            'node_count': self.nodes.count(),
-            'groups': [group.to_json() for group in self.groups],
-            'contacts': [contact.to_json() for contact in self.contacts],
+            'title': self.title,
+            'description': self.description,
+            'cover': self.cover,
+            'price': self.price,
             'created': self.created,
             'updated': self.updated,
-        }
-        return _json
-
-    def response_simple(self):
-        _json = {
-            'id': self.id,
-            'type': self.type.to_json(),
-            'imei': self.imei,
-            'hardware_version': self.hardware_version,
-            'firmware_version': self.firmware_version,
-            'mfg': self.mfg,
         }
         return _json
 
