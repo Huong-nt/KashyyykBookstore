@@ -71,7 +71,12 @@ class UserAuth(Resource):
             if not user:
                 abort(404, message="user not found or not confirmed")
 
+            # Add user id information to token
+            data['userid'] = user.id
+
+            # Verify the password 
             if user.verify_password(data['password']):
+                # Create and embed the user information into access token
                 access_token = create_access_token(identity=data)
                 # refresh_token = create_refresh_token(identity=data)
                 res = {
