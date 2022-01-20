@@ -17,20 +17,22 @@ class UserView(Resource):
     parser.add_argument('pseudonym')
 
     @jwt_required
-    def get(self, user_id):
+    def get(self):
+        # get basic information of user in JWT token
         current_user = get_jwt_identity()
-        user = User.query.filter_by(id=user_id).first()
+        # find user by username
+        user = User.query.filter_by(username=current_user['username']).first()
         if user is None:
             abort(404, message="user not found")
+        # return user information
         return jsonify({
             'ok': True,
             'data': user.get_response()
         })
 
     @jwt_required
-    def put(self, user_id):
-        current_user = get_jwt_identity()
-        
+    def put(self):
+        # parse params
         args = self.parser.parse_args()
         params = {
             'password': args['password'],
@@ -39,24 +41,32 @@ class UserView(Resource):
             'pseudonym': args['pseudonym'],
         }
         logger.info(params)
+        # remove empty params
         params = utils.remove_none_params(params)
 
-        user = User.query.filter_by(id=user_id).first()
+        # get basic information of user in JWT token
+        current_user = get_jwt_identity()
+        # find user by username
+        user = User.query.filter_by(username=current_user['username']).first()
         if user is None:
             abort(404, message="user not found")
 
+        # update user with input params
         for key, value in params.items():
             setattr(user, key, value)
+        # commit the changes to database
         db.session.commit()
+        # return user information
         return jsonify({
             'ok': True,
             'data': user.get_response()
         })
 
     @jwt_required
-    def delete(self, user_id):
+    def delete(self):
+        # get basic information of user in JWT token
         current_user = get_jwt_identity()
-        user = User.query.filter_by(id=user_id).first()
+        user = User.query.filter_by(username=current_user['username']).first()
         if user is None:
             abort(404, message="user not found")
         
@@ -64,4 +74,4 @@ class UserView(Resource):
         # TODO: detele all published book
 
 
-api_restful.add_resource(UserView, '/users/<int:user_id>')
+api_restful.add_resource(UserView, '/users')
