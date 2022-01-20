@@ -99,9 +99,9 @@ class Book(db.Model):
     description = db.Column(db.Text)
     cover = db.Column(db.String(1024))
     price = db.Column(db.Integer, default=0)
+    author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     created = db.Column(db.DateTime(), default=datetime.utcnow)
     updated = db.Column(db.DateTime(), onupdate=datetime.utcnow)
-    
     def __init__(self, **kwargs):
         super(Book, self).__init__(**kwargs)
 
@@ -133,25 +133,6 @@ class RoleUser(db.Model):
         _json = {
             'role_id': self.role_id,
             'user_id': self.user_id,
-        }
-        return _json
-
-
-class PublishedBook(db.Model):
-    __tablename__ = 'published_books'
-
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-    book_id = db.Column(db.Integer, db.ForeignKey('books.id'))
-
-    def __init__(self, **kwargs):
-        super(PublishedBook, self).__init__(**kwargs)
-
-    def to_json(self):
-        _json = {
-            'id': self.id,
-            'user_id': self.user_id,
-            'book_id': self.book_id,
         }
         return _json
 
