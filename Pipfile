@@ -7,7 +7,7 @@ name = "pypi"
 
 [packages]
 grpcio = "==1.26.0"
-flask-restful = "*"
+flask-restful = ">0.3.8"
 flask-cors = "*"
 flask-httpauth = "*"
 flask-limiter = "*"

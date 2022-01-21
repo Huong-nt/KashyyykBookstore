@@ -65,7 +65,7 @@ def create_app(config_name):
 
     app.json_encoder = JSONEncoder
     
-    # from .api import api
-    # app.register_blueprint(api, url_prefix='/bookstore/api/v1')
+    from .api import api
+    app.register_blueprint(api, url_prefix='/bookstore/api/v1')
 
     return app

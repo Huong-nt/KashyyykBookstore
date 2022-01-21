@@ -8,7 +8,7 @@ from flask_restful import Resource, reqparse, abort
 
 from . import api as api, api_restful, logger
 from .. import db
-from ..models import User, Role, RoleUser
+from ..models import User, Role
 from ..schema.user import validate_user_authentication, validate_user
 from ..utils import Utils
 
@@ -23,7 +23,6 @@ class UserRegistration(Resource):
     parser.add_argument('email', type=str)
     parser.add_argument('name')
     parser.add_argument('pseudonym')
-    parser.add_argument('avatar', type=str)
 
     def post(self):
         args = self.parser.parse_args()
@@ -33,7 +32,6 @@ class UserRegistration(Resource):
             'email': args['email'],
             'name': args['name'],
             'pseudonym': args['pseudonym'],
-            'address': args['address'],
         }
         logger.info(args)
         data = validate_user(utils.remove_none_params(args))
@@ -42,10 +40,6 @@ class UserRegistration(Resource):
             logger.info(data)
             user = User(**data)
             db.session.add(user)
-            db.session.commit()
-            role = Role.query.filter_by(name="normal_user").first()
-            roleUser = RoleUser(user_id=user.id, role_id=role.id)
-            db.session.add(roleUser)
             db.session.commit()
             return {'ok': True, 'message': 'User created successfully!'}, 200
         else:

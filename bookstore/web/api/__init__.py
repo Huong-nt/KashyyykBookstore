@@ -10,4 +10,4 @@ api_restful = CustomApi(api)
 
 logger = LocalProxy(lambda: current_app.logger)
 
-from . import user, book
+from . import user, book, authentication
