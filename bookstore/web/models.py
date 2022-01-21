@@ -2,6 +2,7 @@
 from datetime import datetime
 import operator
 
+from flask import current_app
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy import literal, null
@@ -93,6 +94,8 @@ class User(db.Model):
 
     def __init__(self, **kwargs):
         super(User, self).__init__(**kwargs)
+        if self.role is None:
+            self.role = Role.query.filter_by(default=True).first()
 
     def __repr__(self):
         return '<User: {}>'.format(self.id)
