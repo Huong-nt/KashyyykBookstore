@@ -5,7 +5,7 @@ from werkzeug.serving import WSGIRequestHandler, _log
 
 # from flask_migrate import Migrate
 from web import create_app, db
-from web.models import Role, User, RoleUser, Book
+from web.models import Role, User, Book
 
 app = create_app(os.getenv('FLASK_CONFIG') or 'default')
 # migrate = Migrate(app, db)
@@ -18,7 +18,6 @@ def make_shell_context():
         Role=Role,
         User=User,
         Book=Book,
-        RoleUser=RoleUser,
     )
 
 

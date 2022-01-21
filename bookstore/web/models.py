@@ -1,29 +1,41 @@
 
 from datetime import datetime
+import operator
 
-from werkzeug.security import generate_password_hash, check_password_hash
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
-from . import db
+from werkzeug.security import generate_password_hash, check_password_hash
+from sqlalchemy import literal, null
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.orm.collections import attribute_mapped_collection
-from sqlalchemy.orm import backref, aliased
-from sqlalchemy import literal, null
-
-import operator
 from sqlalchemy.orm.collections import MappedCollection, collection
+from sqlalchemy.orm import backref, aliased
 
+from . import db
+
+class Permission:
+    VIEW = 1
+    PUBLISH = 2
+    ADMIN = 4
 
 class Role(db.Model):
     __tablename__ = 'roles'
 
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(64))
-    permission = db.Column(db.Text, nullable=False, default='normal')
+    name = db.Column(db.String(64), unique=True)
+    default = db.Column(db.Boolean, default=False, index=True)
+    permissions = db.Column(db.Integer)
     created = db.Column(db.DateTime(), default=datetime.utcnow)
     updated = db.Column(db.DateTime(), onupdate=datetime.utcnow)
 
+    users = db.relationship('User', backref='role', lazy='dynamic')
+
     def __init__(self, **kwargs):
         super(Role, self).__init__(**kwargs)
+        if self.permissions is None:
+            self.permissions = 0
+
+    def __repr__(self):
+        return '<Role %r>' % self.name
 
     def to_json(self):
         _json = {
@@ -34,6 +46,35 @@ class Role(db.Model):
             'updated': self.updated,
         }
         return _json
+
+    @staticmethod
+    def insert_roles():
+        roles = {
+            'Viewer': [Permission.VIEW],
+            'Publisher': [Permission.VIEW, Permission.PUBLISH],
+            'Administrator': [Permission.VIEW, Permission.PUBLISH, Permission.ADMIN],
+        }
+        default_role = 'Viewer'
+        for r in roles:
+            role = Role.query.filter_by(name=r).first()
+            if role is None:
+                role = Role(name=r)
+            role.reset_permissions()
+            for perm in roles[r]:
+                role.add_permission(perm)
+            role.default = (role.name == default_role)
+            db.session.add(role)
+        db.session.commit()
+
+    def add_permission(self, perm):
+        if not self.has_permission(perm):
+            self.permissions += perm
+    
+    def reset_permissions(self):
+        self.permissions = 0
+
+    def has_permission(self, perm):
+        return self.permissions & perm == perm
 
 
 class User(db.Model):
@@ -46,13 +87,9 @@ class User(db.Model):
     name = db.Column(db.String(128))
     pseudonym = db.Column(db.String(128))
     confirmed = db.Column(db.Boolean, default=False)
+    role_id = db.Column(db.Integer, db.ForeignKey('roles.id'))
     created = db.Column(db.DateTime(), default=datetime.utcnow)
     updated = db.Column(db.DateTime(), onupdate=datetime.utcnow)
-
-    # gateways = db.relationship('Gateway', secondary='user_gateway', backref='users', lazy='dynamic')
-    gateways = association_proxy('user_gateways', 'gateways',
-                    creator=lambda k, v: UserGateway(gateway_role_id=k, gateway=v)
-                )
 
     def __init__(self, **kwargs):
         super(User, self).__init__(**kwargs)
@@ -90,6 +127,26 @@ class User(db.Model):
         except:
             return False
 
+    def generate_confirmation_token(self, expiration=3600):
+        s = Serializer(current_app.config['SECRET_KEY'], expiration)
+        return s.dumps({'confirm': self.id}).decode('utf-8')
+
+    def confirm(self, token):
+        s = Serializer(current_app.config['SECRET_KEY'])
+        try:
+            data = s.loads(token.encode('utf-8'))
+        except:
+            return False
+        if data.get('confirm') != self.id:
+            return False
+        self.confirmed = True
+        db.session.add(self)
+        return True
+
+    def can(self, perm):
+        return self.role is not None and self.role.has_permission(perm)
+
+    
 
 class Book(db.Model):
     __tablename__ = 'books'
@@ -119,20 +176,3 @@ class Book(db.Model):
             'updated': self.updated,
         }
         return _json
-
-
-class RoleUser(db.Model):
-    __tablename__ = 'role_user'
-    role_id = db.Column(db.Integer, db.ForeignKey('roles.id'), primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), primary_key=True)
-
-    def __init__(self, **kwargs):
-        super(RoleUser, self).__init__(**kwargs)
-
-    def to_json(self):
-        _json = {
-            'role_id': self.role_id,
-            'user_id': self.user_id,
-        }
-        return _json
-
