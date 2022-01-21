@@ -42,7 +42,7 @@ class DevelopmentConfig(Config):
 
 class TestingConfig(Config):
     TESTING = True  
-    SQLALCHEMY_DATABASE_URI = 'mysql+mysqldb://%s:%s@%s/bookstore_dev' % (Config.DB_USERNAME, Config.DB_PASSWORD, Config.DB_HOST)
+    SQLALCHEMY_DATABASE_URI = 'mysql+mysqldb://%s:%s@%s/bookstore_test' % (Config.DB_USERNAME, Config.DB_PASSWORD, Config.DB_HOST)
     
 
 class ProductionConfig(Config):

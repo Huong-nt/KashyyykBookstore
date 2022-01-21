@@ -1,11 +1,11 @@
 
 # BookStore Api
 
-======
-
 --------------------------------------------
 
-## Deploy to EC2
+## Deployment
+
+### EC2
 
 ```txt
 1. Build docker image:
@@ -21,7 +21,7 @@
     docker rmi 0984760xxx/bookstore.api:alpha-2019.12.13
 ```
 
-## Runing local
+### Local
 
 ### Setup
 
@@ -72,6 +72,25 @@ or using docker:
 chmod +x boostrap.sh
 docker-compose build
 docker-compose up -d
+```
+
+## Unit test
+
+### Set env variables
+
+```sh
+export FLASK_APP=./bookstore/flasky.py
+export FLASK_CONFIG=development
+export PRESERVE_CONTEXT_ON_EXCEPTION=False
+export DB_HOST=<dbhost>
+export DB_USERNAME=<dbusername>
+export DB_PASSWORD=<dbpassword>
+```
+
+### Run unittest
+
+```sh
+flask test
 ```
 
 ## Config Nginx
