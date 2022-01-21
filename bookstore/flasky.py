@@ -3,12 +3,12 @@ import click
 import logging
 from werkzeug.serving import WSGIRequestHandler, _log
 
-# from flask_migrate import Migrate
+from flask_migrate import Migrate
 from web import create_app, db
 from web.models import Role, User, Book
 
 app = create_app(os.getenv('FLASK_CONFIG') or 'default')
-# migrate = Migrate(app, db)
+migrate = Migrate(app, db)
 
 
 @app.shell_context_processor
