@@ -27,7 +27,7 @@ class UserView(Resource):
         # get basic information of user in JWT token
         current_user = get_jwt_identity()
         # find user by username
-        user = User.query.filter_by(username=current_user['username']).first()
+        user = User.query.filter_by(id=current_user['userid']).first()
         if user is None:
             return jsonify({
                 'ok': False,
@@ -58,8 +58,8 @@ class UserView(Resource):
 
         # get basic information of user in JWT token
         current_user = get_jwt_identity()
-        # find user by username
-        user = User.query.filter_by(username=current_user['username']).first()
+        # find user by user_id
+        user = User.query.filter_by(id=current_user['userid']).first()
         if user is None:
             return jsonify({
                 'ok': False,
@@ -83,7 +83,8 @@ class UserView(Resource):
     def delete(self):
         # get basic information of user in JWT token
         current_user = get_jwt_identity()
-        user = User.query.filter_by(username=current_user['username']).first()
+        # find user by user_id
+        user = User.query.filter_by(id=current_user['userid']).first()
         if user is None:
             abort(404, message="user not found")
 
