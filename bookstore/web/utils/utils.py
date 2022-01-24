@@ -5,7 +5,7 @@ class Utils:
         pass
 
     def remove_none_params(self, params):
-        return {key: value for (key, value) in params.items() if value is not None}
+        return {key: value for (key, value) in params.items() if value != None and value != ''}
     
     def gen_otp(self):
         return str(self._random_with_n_digits(6))
