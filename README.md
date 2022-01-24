@@ -3,6 +3,47 @@
 
 --------------------------------------------
 
+### Init db
+
+```sh
+source $(pipenv --venv)/bin/activate
+(venv) $ flask shell
+db.drop_all()
+db.create_all()
+```
+
+### Migrate database
+
+```sh
+(venv) $ flask db migrate -m "something need to migrate"
+(venv) $ flask db upgrade
+```
+
+## Unit test
+
+### Set env variables
+
+```sh
+export FLASK_APP=./bookstore/flasky.py
+export FLASK_CONFIG=development
+export PRESERVE_CONTEXT_ON_EXCEPTION=False
+export DB_HOST=<dbhost>
+export DB_USERNAME=<dbusername>
+export DB_PASSWORD=<dbpassword>
+```
+
+### Run unittest
+
+```sh
+flask test
+```
+
+Or test a specific module
+
+```sh
+flask test tests.test_basics.BasicsTestCase
+```
+
 ## Deployment
 
 ### EC2
@@ -28,22 +69,6 @@
 ```sh
 sudo apt-get install python3.6-dev libmysqlclient-dev
 pipenv install
-```
-
-### Init db
-
-```sh
-source $(pipenv --venv)/bin/activate
-(venv) $ flask shell
-db.drop_all()
-db.create_all()
-```
-
-### Migrate database
-
-```sh
-(venv) $ flask db migrate -m "something need to migrate"
-(venv) $ flask db upgrade
 ```
 
 ### Run app
@@ -72,25 +97,6 @@ or using docker:
 chmod +x boostrap.sh
 docker-compose build
 docker-compose up -d
-```
-
-## Unit test
-
-### Set env variables
-
-```sh
-export FLASK_APP=./bookstore/flasky.py
-export FLASK_CONFIG=development
-export PRESERVE_CONTEXT_ON_EXCEPTION=False
-export DB_HOST=<dbhost>
-export DB_USERNAME=<dbusername>
-export DB_PASSWORD=<dbpassword>
-```
-
-### Run unittest
-
-```sh
-flask test
 ```
 
 ## Config Nginx
