@@ -84,7 +84,7 @@ class UserAuth(Resource):
                     'token': access_token,
                     # 'refresh': refresh_token
                 }
-                return {'ok': True, 'code': 200, 'data': res}, 200
+                return jsonify({'ok': True, 'code': 200, 'data': res})
             else:
                 jsonify({
                     'ok': False,
