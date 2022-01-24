@@ -86,10 +86,26 @@ class UserView(Resource):
         # find user by user_id
         user = User.query.filter_by(id=current_user['userid']).first()
         if user is None:
-            abort(404, message="user not found")
+            return jsonify({
+                'ok': False,
+                'code': 404,
+                'message': 'user not found'
+            })
 
-        # TODO: detele user
-        # TODO: detele all published book
+        try:
+            # Detele all published book and then, delete the user
+            Book.query.filter_by(author_id=user.id).delete()
+            db.session.delete(user)
+            db.session.commit()
+        except Exception as e:
+            # Rollback if it have any error
+            logger.error(e)
+            db.session.rollback()
+            return {
+                'ok': False,
+                'code': 500,
+                'message': 'internal server error'
+            }, 200
 
 
 api_restful.add_resource(UserView, '/users')
@@ -158,7 +174,7 @@ class UserPublicBookView(Resource):
         file_cover = args['cover']
         file_name = secure_filename(file_cover.filename)
         file_extension = file_name.rsplit('.', 1)[1].lower()
-        if extension not in ALLOWED_EXTENSIONS:
+        if file_extension not in ALLOWED_EXTENSIONS:
             return jsonify({
                 'ok': False,
                 'code': 400,
