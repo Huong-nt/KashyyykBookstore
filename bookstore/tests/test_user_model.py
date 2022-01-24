@@ -3,6 +3,7 @@ import time
 from web import create_app, db
 from web.models import User, Role, Permission
 
+
 class UserModelTestCase(unittest.TestCase):
     def setUp(self):
         self.app = create_app('testing')
@@ -35,29 +36,29 @@ class UserModelTestCase(unittest.TestCase):
         u2 = User(username='cat2', email='cat2@example.com', password='cat')
         self.assertTrue(u1.password_hash != u2.password_hash)
     
-    def test_valid_confirmation_token(self):
-        u = User(username='cat', email='cat@example.com', password='cat')
-        db.session.add(u)
-        db.session.commit()
-        token = u.generate_confirmation_token()
-        self.assertTrue(u.confirm(token))
+    # def test_valid_confirmation_token(self):
+    #     u = User(username='cat', email='cat@example.com', password='cat')
+    #     db.session.add(u)
+    #     db.session.commit()
+    #     token = u.generate_confirmation_token()
+    #     self.assertTrue(u.confirm(token))
     
-    def test_invalid_confirmation_token(self):
-        u1 = User(username='cat', email='cat@example.com', password='cat')
-        u2 = User(username='dog', email='dog@example.com', password='dog')
-        db.session.add(u1)
-        db.session.add(u2)
-        db.session.commit()
-        token = u1.generate_confirmation_token()
-        self.assertFalse(u2.confirm(token))
+    # def test_invalid_confirmation_token(self):
+    #     u1 = User(username='cat', email='cat@example.com', password='cat')
+    #     u2 = User(username='dog', email='dog@example.com', password='dog')
+    #     db.session.add(u1)
+    #     db.session.add(u2)
+    #     db.session.commit()
+    #     token = u1.generate_confirmation_token()
+    #     self.assertFalse(u2.confirm(token))
     
-    def test_expired_confirmation_token(self):
-        u = User(username='cat', email='cat@example.com', password='cat')
-        db.session.add(u)
-        db.session.commit()
-        token = u.generate_confirmation_token(1)
-        time.sleep(2)
-        self.assertFalse(u.confirm(token))
+    # def test_expired_confirmation_token(self):
+    #     u = User(username='cat', email='cat@example.com', password='cat')
+    #     db.session.add(u)
+    #     db.session.commit()
+    #     token = u.generate_confirmation_token(1)
+    #     time.sleep(2)
+    #     self.assertFalse(u.confirm(token))
     
     def test_viewer_role(self):
         u = User(email='john@example.com', password='cat')
