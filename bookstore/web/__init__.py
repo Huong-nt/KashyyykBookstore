@@ -6,7 +6,6 @@ import datetime
 import decimal
 import time
 import logging
-from bson.objectid import ObjectId
 from pathlib import Path
 
 from flask import Flask
@@ -14,7 +13,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_jwt_extended import JWTManager
 from flask_cors import CORS
 from flask_limiter import Limiter
-from flask_limiter.util import get_ipaddr
+from flask_limiter.util import get_remote_address
 
 from config import config
 from boto3.session import Session
@@ -25,8 +24,6 @@ class JSONEncoder(json.JSONEncoder):
     ''' extend json-encoder class'''
 
     def default(self, o):
-        if isinstance(o, ObjectId):
-            return str(o)
         if isinstance(o, set):
             return list(o)
         if isinstance(o, (datetime.date, datetime.datetime, datetime.time)):
@@ -41,7 +38,7 @@ db = SQLAlchemy()
 jwt = JWTManager()
 boto = Boto3()
 limiter = Limiter(
-    key_func=get_ipaddr,
+    key_func=get_remote_address,
     default_limits=["5000 per day", "1000 per hour"]
 )
 
