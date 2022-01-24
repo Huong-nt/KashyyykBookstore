@@ -1,7 +1,5 @@
 import os
 import click
-import logging
-from werkzeug.serving import WSGIRequestHandler, _log
 
 from flask_migrate import Migrate
 from web import create_app, db
