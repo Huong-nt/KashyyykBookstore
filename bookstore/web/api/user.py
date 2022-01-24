@@ -22,7 +22,7 @@ class UserView(Resource):
     parser.add_argument('name')
     parser.add_argument('pseudonym')
 
-    @jwt_required
+    @jwt_required()
     def get(self):
         # get basic information of user in JWT token
         current_user = get_jwt_identity()
@@ -42,7 +42,7 @@ class UserView(Resource):
             'data': user.get_response()
         })
 
-    @jwt_required
+    @jwt_required()
     def put(self):
         # parse params
         args = self.parser.parse_args()
@@ -79,7 +79,7 @@ class UserView(Resource):
             'data': user.get_response()
         })
 
-    @jwt_required
+    @jwt_required()
     def delete(self):
         # get basic information of user in JWT token
         current_user = get_jwt_identity()
@@ -104,7 +104,7 @@ class UserPublicBookView(Resource):
         'cover', type=werkzeug.datastructures.FileStorage, location='files')
     parser.add_argument('price', type=int)
 
-    @jwt_required
+    @jwt_required()
     def get(self, user_id):
         # get basic information of user in JWT token
         current_user = get_jwt_identity()
@@ -131,7 +131,7 @@ class UserPublicBookView(Resource):
             'data': res
         })
 
-    @jwt_required
+    @jwt_required()
     def post(self, user_id):
         # get basic information of user in JWT token
         current_user = get_jwt_identity()
@@ -185,11 +185,11 @@ class UserPublicBookView(Resource):
                 'message': 'internal server error'
             })
 
-    @jwt_required
+    @jwt_required()
     def push(self, user_id, book_id):
         pass
     
-    @jwt_required
+    @jwt_required()
     def delete(self, user_id, book_id):
         pass
 
