@@ -41,9 +41,13 @@ class UserRegistration(Resource):
             user = User(**data)
             db.session.add(user)
             db.session.commit()
-            return {'ok': True, 'message': 'User created successfully!'}, 200
+            return {'ok': True, 'code': 200, 'message': 'User created successfully!'}, 200
         else:
-            return {'ok': False, 'message': 'Bad request parameters: {}'.format(data['message'].message)}, 400
+            return jsonify({
+                'ok': False,
+                'code': 400,
+                'message': f'Bad request parameters: {data["message"].message}'
+            })
 
 
 api_restful.add_resource(UserRegistration, '/register')
@@ -63,8 +67,11 @@ class UserAuth(Resource):
             data = data['data']
             user = User.query.filter_by(username=data['username']).first()
             if not user:
-                abort(404, message="user not found or not confirmed")
-
+                jsonify({
+                    'ok': False,
+                    'code': 404,
+                    'message': 'user not found'
+                })
             # Add user id information to token
             data['userid'] = user.id
 
@@ -77,11 +84,19 @@ class UserAuth(Resource):
                     'token': access_token,
                     # 'refresh': refresh_token
                 }
-                return {'ok': True, 'data': res}, 200
+                return {'ok': True, 'code': 200, 'data': res}, 200
             else:
-                return {'ok': False, 'message': 'invalid username or password'}, 401
+                jsonify({
+                    'ok': False,
+                    'code': 401,
+                    'message': 'invalid username or password'
+                })
         else:
-            return {'ok': False, 'message': 'Bad request parameters: {}'.format(data['message'].message)}, 400
+            return jsonify({
+                'ok': False,
+                'code': 400,
+                'message': f'Bad request parameters: {data["message"].message}'
+            })
 
 
 api_restful.add_resource(UserAuth, '/auth')
