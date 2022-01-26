@@ -24,7 +24,7 @@ class Config:
     AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY')
     BOTO3_ACCESS_KEY = AWS_ACCESS_KEY_ID
     BOTO3_SECRET_KEY = AWS_SECRET_ACCESS_KEY
-    BOTO3_REGION = 'ap-southeast-1'
+    BOTO3_REGION = 'ap-northeast-2'
     BOTO3_SERVICES = ['s3']
 
     JWT_ACCESS_TOKEN_EXPIRES = datetime.timedelta(days=1)

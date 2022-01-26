@@ -67,7 +67,7 @@ class UserAuth(Resource):
             data = data['data']
             user = User.query.filter_by(username=data['username']).first()
             if not user:
-                jsonify({
+                return jsonify({
                     'ok': False,
                     'code': 404,
                     'message': 'user not found'
@@ -84,9 +84,9 @@ class UserAuth(Resource):
                     'token': access_token,
                     # 'refresh': refresh_token
                 }
-                return {'ok': True, 'code': 200, 'data': res}, 200
+                return jsonify({'ok': True, 'code': 200, 'data': res})
             else:
-                jsonify({
+                return jsonify({
                     'ok': False,
                     'code': 401,
                     'message': 'invalid username or password'
