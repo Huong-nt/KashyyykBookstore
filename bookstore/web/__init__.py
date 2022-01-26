@@ -6,7 +6,6 @@ import datetime
 import decimal
 import time
 import logging
-from pathlib import Path
 
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
@@ -16,13 +15,11 @@ from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 
 from config import config
-from boto3.session import Session
 from .utils.flask_boto3 import Boto3
 
 
 class JSONEncoder(json.JSONEncoder):
     ''' extend json-encoder class'''
-
     def default(self, o):
         if isinstance(o, set):
             return list(o)
@@ -48,11 +45,6 @@ def create_app(config_name):
 
     app.logger.setLevel(logging.DEBUG)
     app.config.from_object(config[config_name])
-    boto3_session = Session(
-        aws_access_key_id=app.config['BOTO3_ACCESS_KEY'],
-        aws_secret_access_key=app.config['BOTO3_SECRET_KEY'],
-        region_name=app.config['BOTO3_REGION']
-    )
 
     db.init_app(app)
     jwt.init_app(app)

@@ -1,14 +1,17 @@
 
-from flask import jsonify, request, current_app
+import uuid
+from xml.etree.ElementInclude import FatalIncludeError
+from flask import jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from flask_restful import Resource, reqparse, abort
+from flask_restful import Resource, reqparse
 import werkzeug
 from werkzeug.utils import secure_filename
 
 from . import api as api, api_restful, logger
 from .. import db, boto
 from ..utils import Utils
-from ..models import User, Book
+from ..utils.s3 import S3
+from ..models import User, Book, Permission
 
 utils = Utils()
 
@@ -107,10 +110,10 @@ class UserView(Resource):
             Book.query.filter_by(author_id=user.id).delete()
             db.session.delete(user)
             db.session.commit()
-            return {
+            return jsonify({
                 'ok': False,
                 'code': 200,
-            }, 200
+            })
         except Exception as e:
             # Rollback if it have any error
             logger.error(e)
@@ -127,12 +130,18 @@ api_restful.add_resource(UserView, '/users')
 
 class UserPublicBookView(Resource):
     parser = reqparse.RequestParser()
-    parser.add_argument('title', help='title cannot be blank',
-                        required=True)  # default type: unicode
+    parser.add_argument('title', help='title cannot be blank', required=True)  # default type: unicode
     parser.add_argument('description')  # default type: unicode
     parser.add_argument(
         'cover', type=werkzeug.datastructures.FileStorage, location='files')
     parser.add_argument('price', type=int)
+
+    def __init__(self) -> None:
+        super().__init__()
+
+        # Init Aws s3 client
+        self.S3_BUCKET_NAME = 'kashyyyk-resources'
+        self.s3 = S3(boto.clients['s3'])
 
     @jwt_required()
     def get(self, user_id):
@@ -184,19 +193,28 @@ class UserPublicBookView(Resource):
                 'code': 404,
                 'message': 'user not found'
             })
-
-        # parse book cover file content
-        file_cover = args['cover']
-        file_name = secure_filename(file_cover.filename)
-        file_extension = file_name.rsplit('.', 1)[1].lower()
-        if file_extension not in ALLOWED_EXTENSIONS:
+        if user.can(Permission.PUBLISH) == False:
             return jsonify({
                 'ok': False,
-                'code': 400,
-                'message': 'file extension is not one of our supported types'
+                'code': 401,
+                'message': 'user does not have permission to publish the book'
             })
-        # TODO: upload book cover to S3 (set public access)
-        book_cover_url = ''
+        # parse book cover file content
+        book_cover_url = None
+        if 'cover' in args and args['cover'].filename != '':
+            file_cover = args['cover']
+            file_name = secure_filename(file_cover.filename)
+            file_extension = file_name.rsplit('.', 1)[1].lower()
+            if file_extension not in ALLOWED_EXTENSIONS:
+                return jsonify({
+                    'ok': False,
+                    'code': 400,
+                    'message': 'file extension is not one of our supported types'
+                })
+            # TODO: upload book cover to S3 (set public access)
+            image_key_name = f'books/cover/' + uuid.uuid4().hex + '.' + file_extension
+            book_cover_url = self.s3.upload_public(self.S3_BUCKET_NAME, image_key_name, file_cover, file_extension)
+
         try:
             book = Book(
                 title=args['title'],
@@ -207,6 +225,11 @@ class UserPublicBookView(Resource):
             )
             db.session.add(book)
             db.session.commit()
+            return jsonify({
+                'ok': True,
+                'code': 200,
+                'data': book.get_response()
+            })
         except Exception as e:
             logger.error(e)
             db.session.rollback()

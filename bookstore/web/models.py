@@ -179,3 +179,6 @@ class Book(db.Model):
             'updated': self.updated,
         }
         return _json
+
+    def get_response(self):
+        return self.to_json()
