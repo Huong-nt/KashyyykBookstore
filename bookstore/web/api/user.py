@@ -130,7 +130,7 @@ api_restful.add_resource(UserView, '/users')
 
 class UserPublicBookView(Resource):
     parser = reqparse.RequestParser()
-    parser.add_argument('title', help='title cannot be blank', required=True)  # default type: unicode
+    parser.add_argument('title', help='title cannot be blank')  # default type: unicode
     parser.add_argument('description')  # default type: unicode
     parser.add_argument(
         'cover', type=werkzeug.datastructures.FileStorage, location='files')
@@ -201,7 +201,7 @@ class UserPublicBookView(Resource):
             })
         # parse book cover file content
         book_cover_url = None
-        if 'cover' in args and args['cover'].filename != '':
+        if 'cover' in args and args['cover'] != None and args['cover'].filename != '':
             file_cover = args['cover']
             file_name = secure_filename(file_cover.filename)
             file_extension = file_name.rsplit('.', 1)[1].lower()
@@ -240,7 +240,7 @@ class UserPublicBookView(Resource):
             })
 
     @jwt_required()
-    def push(self, user_id, book_id):
+    def put(self, user_id, book_id):
         # get basic information of user in JWT token
         current_user = get_jwt_identity()
         if user_id != current_user['userid']:
@@ -272,12 +272,10 @@ class UserPublicBookView(Resource):
         params = {
             'title': args['title'],
             'description': args['description'],
-            'cover': args['cover'],
             'price': args['price'],
         }
         logger.info(params)
-        
-        if 'cover' in args:
+        if 'cover' in args and args['cover'] != None and args['cover'].filename != '':
             # parse book cover file content and upload to aws S3
             file_cover = args['cover']
             file_name = secure_filename(file_cover.filename)
@@ -289,9 +287,9 @@ class UserPublicBookView(Resource):
                     'code': 400,
                     'message': 'file extension is not one of our supported types'
                 })
-            # TODO: upload book cover to S3 (set public access)
-            book_cover_url = ''
-            params['cover'] = book_cover_url
+            # upload book cover to S3 (set public access)
+            image_key_name = f'books/cover/' + uuid.uuid4().hex + '.' + file_extension
+            params['cover'] = self.s3.upload_public(self.S3_BUCKET_NAME, image_key_name, file_cover, file_extension)
 
         params = utils.remove_none_params(params)
         try:
