@@ -23,6 +23,7 @@ db.create_all()
 
 ### Set env variables
 
+- Linux
 ```sh
 export FLASK_APP=./bookstore/flasky.py
 export FLASK_CONFIG=development
@@ -30,6 +31,19 @@ export PRESERVE_CONTEXT_ON_EXCEPTION=False
 export DB_HOST=<dbhost>
 export DB_USERNAME=<dbusername>
 export DB_PASSWORD=<dbpassword>
+export AWS_ACCESS_KEY_ID=<awsaccesskey>
+export AWS_SECRET_ACCESS_KEY=<awssecretkey>
+```
+- Window
+```sh
+set FLASK_APP=./bookstore/flasky.py
+set FLASK_CONFIG=development
+set PRESERVE_CONTEXT_ON_EXCEPTION=False
+set DB_HOST=<dbhost>
+set DB_USERNAME=<dbpassword>
+set DB_PASSWORD=<dbpassword>
+set AWS_ACCESS_KEY_ID=<awsaccesskey>
+set AWS_SECRET_ACCESS_KEY=<awssecretkey>
 ```
 
 ### Run unittest
