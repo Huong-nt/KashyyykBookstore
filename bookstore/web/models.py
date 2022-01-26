@@ -175,6 +175,7 @@ class Book(db.Model):
             'description': self.description,
             'cover': self.cover,
             'price': self.price,
+            'author_id': self.author_id,
             'created': self.created,
             'updated': self.updated,
         }
