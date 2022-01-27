@@ -17,12 +17,17 @@ def validate_query_filters(args):
             {"name":"price","op":"ge","val":10000},
         ]
     }
+    or
+    q={
+        "filters": [
+            {"name":"title","op":"ilike","val":"%game%"},
+        ]
+    }
     '''
     if 'q' in args:
-        q = json.loads(args['q'])
-        if 'filters' in q:
-            return q['filters']
-    return None
+        q = args['q'].replace('\n', '')
+        q = json.loads(q)
+        return q['filters']
 
 
 class BookView(Resource):
@@ -45,7 +50,14 @@ class BookView(Resource):
         else:
             # TODO: pagination
             args = request.args
-            filters = validate_query_filters(args)
+            try:
+                filters = validate_query_filters(args)
+            except:
+                return jsonify({
+                    'ok': False,
+                    'code': 400,
+                    'message': 'filter is invalid'
+                })
             if filters == None:
                 books = Book.query.all()
             else:

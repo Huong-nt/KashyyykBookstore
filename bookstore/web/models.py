@@ -1,15 +1,9 @@
 
 from datetime import datetime
-import operator
 
 from flask import current_app
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from werkzeug.security import generate_password_hash, check_password_hash
-from sqlalchemy import literal, null
-from sqlalchemy.ext.associationproxy import association_proxy
-from sqlalchemy.orm.collections import attribute_mapped_collection
-from sqlalchemy.orm.collections import MappedCollection, collection
-from sqlalchemy.orm import backref, aliased
 
 from . import db
 
@@ -17,6 +11,7 @@ class Permission:
     VIEW = 1
     PUBLISH = 2
     ADMIN = 4
+
 
 class Role(db.Model):
     __tablename__ = 'roles'
@@ -92,6 +87,8 @@ class User(db.Model):
     created = db.Column(db.DateTime(), default=datetime.utcnow)
     updated = db.Column(db.DateTime(), onupdate=datetime.utcnow)
 
+    books = db.relationship('Book', backref='author', lazy='dynamic')
+
     def __init__(self, **kwargs):
         super(User, self).__init__(**kwargs)
         if self.role is None:
@@ -162,6 +159,7 @@ class Book(db.Model):
     author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     created = db.Column(db.DateTime(), default=datetime.utcnow)
     updated = db.Column(db.DateTime(), onupdate=datetime.utcnow)
+    
     def __init__(self, **kwargs):
         super(Book, self).__init__(**kwargs)
 
