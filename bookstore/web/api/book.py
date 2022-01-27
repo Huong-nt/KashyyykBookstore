@@ -3,6 +3,7 @@ import json
 
 from flask import jsonify, request, current_app
 from flask_restful import Resource
+from flask_restless import search
 
 from . import api as api, api_restful, logger
 from .. import db
@@ -48,7 +49,7 @@ class BookView(Resource):
             if filters == None:
                 books = Book.query.all()
             else:
-                books = filter.search(db, Book, filters).all()
+                books = search.search(db, Book, filters).all()
             return jsonify({
                 'ok': True,
                 'code': 200,
