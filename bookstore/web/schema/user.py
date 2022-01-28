@@ -3,7 +3,7 @@ from jsonschema.exceptions import ValidationError
 from jsonschema.exceptions import SchemaError
 
 
-user_schema = {
+user_register_schema = {
     "type": "object",
     "properties": {
         "username": {"type": "string", "maxLength": 128},
@@ -16,14 +16,14 @@ user_schema = {
         "name": { "type": "string", "maxLength": 128 },
         "pseudonym": { "type": "string", "maxLength": 128 },
     },
-    "required": ["username", "password"],
+    "required": ["username", "email", "password"],
     "additionalProperties": False
 }
 
 
-def validate_user(data):
+def validate_register_user(data):
     try:
-        validate(data, user_schema)
+        validate(data, user_register_schema)
     except ValidationError as e:
         return {'ok': False, 'message': e}
     except SchemaError as e:

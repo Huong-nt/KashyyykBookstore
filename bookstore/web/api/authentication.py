@@ -6,7 +6,7 @@ from flask_restful import Resource, reqparse
 from . import api as api, api_restful, logger
 from .. import db
 from ..models import User
-from ..schema.user import validate_user_authentication, validate_user
+from ..schema.user import validate_user_authentication, validate_register_user
 from ..utils import Utils
 from ..utils.response import build_response, get_content_type
 
@@ -35,7 +35,7 @@ class UserRegistration(Resource):
             'pseudonym': args['pseudonym'],
         }
         logger.info(args)
-        data = validate_user(utils.remove_none_params(args))
+        data = validate_register_user(utils.remove_none_params(args))
         if data['ok']:
             data = data['data']
             logger.info(data)

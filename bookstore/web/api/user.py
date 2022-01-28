@@ -11,6 +11,7 @@ from .. import db, boto
 from ..utils import Utils
 from ..utils.s3 import S3
 from ..models import User, Book, Permission
+from ..schema.book import validate_publish_book, validate_update_book
 from ..utils.response import build_response, get_content_type
 
 utils = Utils()
@@ -196,6 +197,8 @@ class UserPublicBookView(Resource):
                 'code': 404,
                 'message': 'user not found'
             }, content_type)
+        
+        # Check user permission
         if user.can(Permission.PUBLISH) == False:
             return build_response({
                 'ok': False,
