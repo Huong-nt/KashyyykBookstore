@@ -34,7 +34,7 @@ class UserRegistration(Resource):
             'name': args['name'],
             'pseudonym': args['pseudonym'],
         }
-        logger.info(args)
+        # logger.info(args)
         data = validate_register_user(utils.remove_none_params(args))
         if data['ok']:
             data = data['data']
