@@ -16,11 +16,11 @@ class ApiUserTestCase(unittest.TestCase):
 
         # create a Publisher and a Viewer
         r = Role.query.filter_by(name='Publisher').first()
-        self.u1 = User(email='john@example.com', username='JohnPublisher',
-                  password='cat@big', pseudonym='JP', role=r)
+        self.u1 = User(email='lohgarra@example.com', username='loh', name='Lohgarra',
+                  password='cat@big', pseudonym='LP', role=r)
         r = Role.query.filter_by(name='Viewer').first()
-        self.u2 = User(email='doe@example.com', username='DoeViewer',
-                  password='dog@small', pseudonym='DV', role=r)
+        self.u2 = User(email='vader@example.com', username='vader', name='Darth Vader',
+                  password='dog@small', pseudonym='VV', role=r)
         db.session.add(self.u1)
         db.session.add(self.u2)
         db.session.commit()
@@ -77,10 +77,11 @@ class ApiUserTestCase(unittest.TestCase):
         response_json = response.get_json()
         self.assertEqual(response_json['code'], 200)
 
-    def test_user_publish_book(self):
+    def test_publisher_publish_book(self):
+        # Publisher
         # get access token
         response = self.client.post('bookstore/api/v1/auth', data={
-            'username': 'JohnPublisher',
+            'username': self.u1.username,
             'password': 'cat@big'
         })
         self.assertEqual(response.status_code, 200)
@@ -131,3 +132,28 @@ class ApiUserTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         response_json = response.get_json()
         self.assertEqual(response_json['code'], 200)
+
+    def test_viewer_publish_book(self):
+        # get access token
+        response = self.client.post('bookstore/api/v1/auth', data={
+            'username': self.u2.username,
+            'password': 'dog@small'
+        })
+        self.assertEqual(response.status_code, 200)
+        response_json = response.get_json()
+        self.assertEqual(response_json['code'], 200)
+        token = response_json['data']['token']
+
+        # Publish a book
+        response = self.client.post(
+            f'bookstore/api/v1/users/{self.u1.id}/books',
+            headers={'Authorization': f'Bearer {token}'},
+            data={
+                'title': 'Game of Animal',
+                'description': 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+                'price': 30000
+            },
+        )
+        self.assertEqual(response.status_code, 200)
+        response_json = response.get_json()
+        self.assertEqual(response_json['code'], 403)
