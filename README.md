@@ -60,32 +60,27 @@ flask test tests.test_basics.BasicsTestCase
 
 ## Deployment
 
-### EC2
+### Docker
 
 ```txt
 1. Build docker image:
     docker-compose build
-2. Eport image:
-    docker images
-    docker save 0984760xxx/bookstore.api:alpha-2020.03.13 > alpha-2020.03.13.tar
-3. Load image:
-    docker load --input alpha-2020.03.13.tar
-4. Run image:
+2. Upload image to docker hub:
+    docker push 0984760xxx/bookstore.api:alpha-2020.03.13
+3. Run image:
     docker-compose up -d
-5. Remove old image:
-    docker rmi 0984760xxx/bookstore.api:alpha-2019.12.13
 ```
 
 ### Local
 
-### Setup
+#### Setup
 
 ```sh
 sudo apt-get install python3.6-dev libmysqlclient-dev
 pipenv install
 ```
 
-### Run app
+#### Run app
 
 ```sh
 chmod +x bash_bootstrap.sh
