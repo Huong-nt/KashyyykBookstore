@@ -268,12 +268,12 @@ class UserPublicBookView(Resource):
                 'code': 404,
                 'message': 'user not found'
             })
-        book = Book.query.filter_by(id=book_id).first()
+        book = Book.query.filter_by(id=book_id, author_id=user_id).first()
         if book is None:
             return build_response({
                 'ok': False,
                 'code': 404,
-                'message': 'user not found'
+                'message': 'book not found or user do not have permission to update the book'
             }, content_type)
         
         params = {
